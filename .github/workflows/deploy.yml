@@ -19,9 +19,11 @@ jobs:
     - name: Install wasm-pack
       run: curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh
 
-    - name: Install prerequisites
-      run: |
-        cargo install --locked worker-build
+    - name: Install wasm-opt
+      uses: Aandreba/setup-binaryen
+
+    - name: Install worker-build
+      run: cargo install --locked worker-build
 
     - name: Publish
       uses: cloudflare/wrangler-action@v3

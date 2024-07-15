@@ -1,15 +1,8 @@
 [package]
-name = "worker-axum-tut"
+name = "erudify-web"
 version = "0.1.0"
 edition = "2021"
 authors = [ "lemmih <lemmih@gmail.com>" ]
-
-[package.metadata.release]
-release = false
-
-# https://github.com/rustwasm/wasm-pack/issues/1247
-[package.metadata.wasm-pack.profile.release]
-wasm-opt = false
 
 [lib]
 crate-type = ["cdylib"]
