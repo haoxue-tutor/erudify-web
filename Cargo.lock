@@ -463,7 +463,6 @@ dependencies = [
  "tower",
  "tower-service",
  "wasm-bindgen",
- "wasm-bindgen-futures",
  "worker",
  "worker-macros",
 ]
@@ -2044,7 +2043,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "76bc14366121efc8dbb487ab05bcc9d346b3b5ec0eaa76e46594cabbe51762c0"
 dependencies = [
  "cfg-if",
- "futures-core",
  "js-sys",
  "wasm-bindgen",
  "web-sys",
