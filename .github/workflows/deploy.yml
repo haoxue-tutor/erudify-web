@@ -18,8 +18,8 @@ jobs:
 
     - name: Install prerequisites
       run: |
-        cargo install --fixed worker-build
-        cargo install --fixed wasm-pack
+        cargo install --locked worker-build
+        cargo install --locked wasm-pack
 
     - name: Publish
       uses: cloudflare/wrangler-action@v3
