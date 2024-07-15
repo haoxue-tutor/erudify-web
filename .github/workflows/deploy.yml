@@ -19,8 +19,8 @@ jobs:
     - name: Install wasm-pack
       run: curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh
 
-    - name: Install wasm-opt
-      uses: Aandreba/setup-binaryen
+    - name: Setup Binaryen
+      uses: Aandreba/setup-binaryen@v1.0.0
 
     - name: Install worker-build
       run: cargo install --locked worker-build
