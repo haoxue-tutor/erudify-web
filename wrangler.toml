@@ -1,0 +1,6 @@
+name = "worker-axum-tut"
+main = "build/worker/shim.mjs"
+compatibility_date = "2024-07-13"
+
+[build]
+command = "wasm-pack build --no-typescript --release --target web --out-name client --features hydrate --no-default-features && worker-build --release --features ssr --no-default-features"
