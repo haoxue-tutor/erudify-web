@@ -19,9 +19,10 @@ jobs:
     - name: Install wasm-pack
       run: curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh
 
-    - name: Setup Binaryen
-      run: |
-        sudo apt install binaryen
+    - uses: sigoden/install-binary@v1
+      with:
+        repo: WebAssembly/binaryen
+        name: wasm-opt
 
     - name: Install worker-build
       run: cargo install --locked worker-build
