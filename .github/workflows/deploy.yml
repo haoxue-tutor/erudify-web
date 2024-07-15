@@ -20,7 +20,8 @@ jobs:
       run: curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh
 
     - name: Setup Binaryen
-      uses: Aandreba/setup-binaryen@v1.0.0
+      run: |
+        sudo apt install binaryen
 
     - name: Install worker-build
       run: cargo install --locked worker-build
