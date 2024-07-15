@@ -1,4 +1,4 @@
-name = "worker-axum-tut"
+name = "erudify-web"
 main = "build/worker/shim.mjs"
 compatibility_date = "2024-07-13"
 
