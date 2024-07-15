@@ -1,0 +1,27 @@
+name: Deploy
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Rust
+      uses: actions-rust-lang/setup-rust-toolchain@v1
+
+    - name: Install prerequisites
+      run: |
+        cargo install --fixed worker-build
+        cargo install --fixed wasm-pack
+
+    - name: Publish
+      uses: cloudflare/wrangler-action@4
+      with:
+        apiToken: ${{ secrets.CF_API_TOKEN }}
