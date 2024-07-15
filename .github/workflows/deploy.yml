@@ -3,7 +3,7 @@ name: Deploy
 on:
   push:
     branches:
-      - main
+      - '*'
 
 jobs:
   deploy:
@@ -27,7 +27,15 @@ jobs:
     - name: Install worker-build
       run: cargo install --locked worker-build
 
+    - name: Dry Run
+      if: github.ref != 'refs/heads/main'
+      uses: cloudflare/wrangler-action@v3
+      with:
+        apiToken: ${{ secrets.CF_API_TOKEN }}
+        command: deploy --dry-run
+
     - name: Publish
+      if: github.ref == 'refs/heads/main'
       uses: cloudflare/wrangler-action@v3
       with:
         apiToken: ${{ secrets.CF_API_TOKEN }}
