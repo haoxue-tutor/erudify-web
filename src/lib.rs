@@ -13,6 +13,7 @@ pub fn App() -> impl IntoView {
     provide_meta_context();
     view! {
         <Stylesheet href="/pkg/style.css"/>
+        <Link rel="icon" type_="image/x-icon" href="/pkg/favicon.ico"/>
         <p>Leptos</p>
         <button on:click=move |_| {
             spawn_local(async move {

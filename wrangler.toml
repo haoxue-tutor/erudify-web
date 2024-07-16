@@ -7,4 +7,4 @@ routes = [
 ]
 
 [build]
-command = "npx tailwindcss --minify -i style/tailwind.css -o pkg/style.css && wasm-pack build --no-typescript --release --target web --out-name client --features hydrate --no-default-features && worker-build --release --features ssr --no-default-features"
+command = "cp public/* pkg && npx tailwindcss --minify -i style/tailwind.css -o pkg/style.css && wasm-pack build --no-typescript --release --target web --out-name client --features hydrate --no-default-features && worker-build --release --features ssr --no-default-features"
