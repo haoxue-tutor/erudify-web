@@ -12,6 +12,7 @@ pub async fn shouting_text(input: String) -> Result<String, ServerFnError> {
 pub fn App() -> impl IntoView {
     provide_meta_context();
     view! {
+        <Stylesheet href="/pkg/style.css"/>
         <p>Leptos</p>
         <button on:click=move |_| {
             spawn_local(async move {
