@@ -451,7 +451,7 @@ dependencies = [
  "axum",
  "console_error_panic_hook",
  "console_log",
- "http 0.2.12",
+ "http 1.1.0",
  "include_dir",
  "leptos",
  "leptos_axum",
