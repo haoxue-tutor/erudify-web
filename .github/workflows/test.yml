@@ -9,7 +9,7 @@ on:
       - main
 
 jobs:
-  deploy:
+  test:
     runs-on: ubuntu-latest
 
     steps:
@@ -43,7 +43,9 @@ jobs:
 
     - name: Run website
       run: |
+        npx wrangler@latest build
         npx wrangler@latest dev &
+        echo "waiting"
         timeout 22 sh -c 'until nc -z $0 $1; do sleep 1; done' 127.0.0.1 8787
 
     - name: E2E
