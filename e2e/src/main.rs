@@ -7,12 +7,12 @@ pub static CHROME_DRIVER_URL: &str = "http://127.0.0.1:9515";
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
-    let cap = DesiredCapabilities::chrome();
-    // cap.set_headless()?;
+    let mut cap = DesiredCapabilities::chrome();
+    cap.set_headless()?;
     let chrome = WebDriver::new(CHROME_DRIVER_URL, cap).await?;
     chrome.goto(WEBPAGE_URL).await?;
-    let active = chrome.find(By::Tag("html")).await?;
-    println!("{}", active.outer_html().await?);
+    // let active = chrome.find(By::Tag("html")).await?;
+    // println!("{}", active.outer_html().await?);
     chrome.quit().await?;
 
     Ok(())
