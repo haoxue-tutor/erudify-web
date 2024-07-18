@@ -47,8 +47,11 @@ jobs:
         npx wrangler@latest dev &
         echo "waiting"
         timeout 120 sh -c 'until nc -z $0 $1; do sleep 1; done' 127.0.0.1 8787
+        curl 127.0.0.1:8787
+
 
     - name: E2E
       run: |
+        curl 127.0.0.1:8787
         cd e2e
         cargo run
