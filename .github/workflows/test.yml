@@ -56,6 +56,6 @@ jobs:
         cd e2e
         cargo run || echo "e2e failed"
         echo "dev.txt"
-        cat dev.txt
+        cat ../dev.txt
         echo "driver.txt"
-        cat driver.txt
+        cat ../driver.txt
