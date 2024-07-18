@@ -39,23 +39,17 @@ jobs:
         chromedriver-version: '126.0.6478.182'
     - run: |
         export DISPLAY=:99
-        chromedriver > driver.txt &
+        chromedriver &
 
     - name: Run website
       run: |
         npx wrangler@latest build
-        npx wrangler@latest dev > dev.txt &
+        npx wrangler@latest dev &
         echo "waiting"
         timeout 120 sh -c 'until nc -z $0 $1; do sleep 1; done' 127.0.0.1 8787
-        curl 127.0.0.1:8787
-
 
     - name: E2E
       run: |
-        curl 127.0.0.1:8787
         cd e2e
-        cargo run || echo "e2e failed"
-        echo "dev.txt"
-        cat ../dev.txt
-        echo "driver.txt"
-        cat ../driver.txt
+        cargo build
+        cargo run
