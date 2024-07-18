@@ -39,7 +39,7 @@ jobs:
         chromedriver-version: '126.0.6478.182'
     - run: |
         export DISPLAY=:99
-        chromedriver --url-base=/wd/hub > driver.txt &
+        chromedriver > driver.txt &
 
     - name: Run website
       run: |
