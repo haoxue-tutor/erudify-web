@@ -13,7 +13,7 @@ async fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
     chrome.goto(WEBPAGE_URL).await?;
     // let active = chrome.find(By::Tag("html")).await?;
     // println!("{}", active.outer_html().await?);
-    chrome.quit().await?;
+    // chrome.quit().await?;
 
     Ok(())
 }
