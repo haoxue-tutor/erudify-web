@@ -460,6 +460,7 @@ dependencies = [
  "log",
  "mime",
  "mime_guess",
+ "serde",
  "tower",
  "tower-service",
  "wasm-bindgen",
