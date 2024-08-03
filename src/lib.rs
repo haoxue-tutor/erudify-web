@@ -1,5 +1,73 @@
-use leptos::{component, server, spawn_local, view, IntoView, ServerFnError};
+use leptos::{component, server, spawn_local, view, For, IntoView, ServerFnError};
 use leptos_meta::*;
+use serde::{Deserialize, Serialize};
+
+#[derive(Debug, Clone, Eq, PartialEq, Serialize, Deserialize)]
+pub struct Exercise {
+    pub segments: Vec<Segment>,
+    pub english: String,
+}
+
+fn ex_1() -> Exercise {
+    Exercise {
+        segments: vec![
+            Segment {
+                chinese: String::from("我"),
+                pinyin: String::from("wǒ"),
+            },
+            Segment {
+                chinese: String::from("是"),
+                pinyin: String::from("shì"),
+            },
+            Segment {
+                chinese: String::from("学生"),
+                pinyin: String::from("xué sheng"),
+            },
+            Segment {
+                chinese: String::from("。"),
+                pinyin: String::from(""),
+            },
+        ],
+        english: String::from("I am a student."),
+    }
+}
+fn ex_2() -> Exercise {
+    Exercise {
+        segments: vec![
+            Segment {
+                chinese: String::from("明天"),
+                pinyin: String::from("míng tiān"),
+            },
+            Segment {
+                chinese: String::from("我"),
+                pinyin: String::from("wǒ"),
+            },
+            Segment {
+                chinese: String::from("会"),
+                pinyin: String::from("huì"),
+            },
+            Segment {
+                chinese: String::from("去"),
+                pinyin: String::from("qù"),
+            },
+            Segment {
+                chinese: String::from("图书馆"),
+                pinyin: String::from("tú shū guǎn"),
+            },
+            Segment {
+                chinese: String::from("。"),
+                pinyin: String::from(""),
+            },
+        ],
+        english: String::from("I will go to the library tomorrow."),
+    }
+}
+
+#[derive(Debug, Clone, Eq, PartialEq, Serialize, Deserialize)]
+pub struct Segment {
+    pub chinese: String,
+    pub pinyin: String,
+}
 
 #[server]
 pub async fn shouting_text(input: String) -> Result<String, ServerFnError> {
@@ -9,11 +77,98 @@ pub async fn shouting_text(input: String) -> Result<String, ServerFnError> {
 }
 
 #[component]
+pub fn AudioExercise(exercise: Exercise, index: usize) -> impl IntoView {
+    view! {
+        <form>
+            <For
+                each=move || exercise.segments.clone().into_iter().enumerate()
+                key=|(idx, segment)| segment.chinese.clone()
+                let:segment
+            >
+                    {}
+                {segment.1.chinese}
+            </For>
+        // for (nth , segment) in exercise.segments.iter().enumerate() {
+        // if nth < index || segment.pinyin.is_empty() {
+        // span {
+        // class: "done",
+        // style: "width: {segment.chinese.chars().count() as i64}em",
+        // "{segment.chinese} "
+        // }
+        // } else if nth == index {
+        // input {
+        // style: "width: {segment.chinese.chars().count() as i64}em;",
+        // name: "input",
+        // onmounted: move |cx| {
+        // spawn(async move {
+        // let _ = cx.data().set_focus(true).await;
+        // });
+        // },
+        // value: "{input}",
+        // oninput: move |event| oninput.call(event)
+        // }
+        // } else {
+        // span {
+        // class: "future",
+        // style: "width: {segment.chinese.chars().count() as i64}em",
+        // "{segment.chinese} "
+        // }
+        // }
+        // }
+        </form>
+    }
+}
+// #[component]
+// fn AudioExercise(
+//     exercise: Exercise,
+//     index: usize,
+//     input: Signal<String>,
+//     onsubmit: EventHandler<FormEvent>,
+//     oninput: EventHandler<FormEvent>,
+// ) -> Element {
+//     rsx! {
+//         form { class: "exercise", onsubmit: move |event| onsubmit.call(event),
+//             for (nth , segment) in exercise.segments.iter().enumerate() {
+//                 if nth < index || segment.pinyin.is_empty() {
+//                     span {
+//                         class: "done",
+//                         style: "width: {segment.chinese.chars().count() as i64}em",
+//                         "{segment.chinese} "
+//                     }
+//                 } else if nth == index {
+//                     input {
+//                         style: "width: {segment.chinese.chars().count() as i64}em;",
+//                         name: "input",
+//                         onmounted: move |cx| {
+//                             spawn(async move {
+//                                 let _ = cx.data().set_focus(true).await;
+//                             });
+//                         },
+//                         value: "{input}",
+//                         oninput: move |event| oninput.call(event)
+//                     }
+//                 } else {
+//                     span {
+//                         class: "future",
+//                         style: "width: {segment.chinese.chars().count() as i64}em",
+//                         "{segment.chinese} "
+//                     }
+//                 }
+//             }
+//         }
+//         button { class: "btn btn-blue", "Replay audio" }
+//         button { class: "bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded",
+//             "Next exercise"
+//         }
+//     }
+// }
+
+#[component]
 pub fn App() -> impl IntoView {
     provide_meta_context();
     view! {
-        <Stylesheet href="/pkg/style.css"/>
-        <Link rel="icon" type_="image/x-icon" href="/pkg/favicon.ico"/>
+        <Stylesheet href="/pkg/style.css" />
+        <Link rel="icon" type_="image/x-icon" href="/pkg/favicon.ico" />
         <p>Leptos</p>
         <button on:click=move |_| {
             spawn_local(async move {
@@ -21,6 +176,7 @@ pub fn App() -> impl IntoView {
                 log::info!("Got answer from server: {:?}", val);
             });
         }>Test</button>
+        <AudioExercise exercise=ex_1() index=0 />
     }
 }
 
