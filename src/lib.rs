@@ -1,6 +1,8 @@
-use leptos::*;
+use leptos::task::spawn_local;
+use leptos::{prelude::*, *};
 use leptos_meta::*;
-use leptos_router::use_query_map;
+use leptos_router::*;
+use leptos_router::{components::*, hooks::use_query_map};
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Eq, PartialEq, Serialize, Deserialize)]
@@ -106,9 +108,9 @@ pub fn AudioExercise(exercise: Exercise, index: usize) -> impl IntoView {
                     let x = if segment.0 == index {
                         view! {
                             <SizedInput/>
-                        }.into_view()
+                        }.into_any()
                     } else {
-                        view! { {segment.1.chinese.to_string()} }.into_view()
+                        view! { {segment.1.chinese.to_string()} }.into_any()
                     };
                     view! { {x} }
                 }}
@@ -194,8 +196,6 @@ pub fn AudioExercise(exercise: Exercise, index: usize) -> impl IntoView {
 //     }
 // }
 
-use leptos_router::{Route, Router, Routes};
-
 #[component]
 pub fn App() -> impl IntoView {
     provide_meta_context();
@@ -203,11 +203,15 @@ pub fn App() -> impl IntoView {
         <Stylesheet href="/pkg/style.css" />
         <Link rel="icon" type_="image/x-icon" href="/pkg/favicon.ico" />
         <Router>
-            <Routes>
-                <Route path="/" view=StartPage />
-                <Route path="/signin" view=SignInPage />
-                <Route path="/oauth/github" view=GithubOAuth2Callback />
+            <main>
+              <Routes fallback=|| {
+                view! { <div class="p-4 text-center">Page Not Found</div> }
+              }>
+                <Route path=path!("/") view=StartPage />
+                <Route path=path!("/signin") view=SignInPage />
+                <Route path=path!("/oauth/github") view=GithubOAuth2Callback />
             </Routes>
+            </main>
         </Router>
     }
 }
@@ -277,7 +281,7 @@ fn GithubOAuth2Callback() -> impl IntoView {
     let (user_info, set_user_info) = create_signal(String::new());
     let (user_email, set_user_email) = create_signal(String::new());
     let query_map = use_query_map();
-    let code = query_map.with(|query_map| query_map.get("code").cloned().unwrap_or_default());
+    let code = query_map.with(|query_map| query_map.get("code").unwrap_or_default());
 
     create_effect(move |_| {
         let code = code.clone();
@@ -360,45 +364,54 @@ fn SignInPage() -> impl IntoView {
     }
 }
 
+#[cfg(feature = "ssr")]
+pub fn shell(options: LeptosOptions) -> impl IntoView {
+    view! {
+      <!DOCTYPE html>
+      <html lang="en">
+        <head>
+          <title>HIIT</title>
+          <meta charset="utf-8" />
+          <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+          <AutoReload options=options.clone() />
+          <HydrationScripts options />
+          <MetaTags />
+        </head>
+        <body class="bg-gray-100">
+          <App />
+        </body>
+      </html>
+    }
+}
+
 #[cfg(feature = "hydrate")]
 #[wasm_bindgen::prelude::wasm_bindgen]
 pub fn hydrate() {
     _ = console_log::init_with_level(log::Level::Debug);
     console_error_panic_hook::set_once();
-    leptos::mount_to_body(App);
+    leptos::mount::hydrate_body(App);
 }
 
 #[cfg(feature = "ssr")]
 mod ssr_imports {
+    use std::sync::Arc;
+
     use crate::App;
     use axum::http::{HeaderValue, StatusCode};
+    use axum::Extension;
     use axum::{
         extract::Path,
         response::IntoResponse,
         routing::{get, post},
         Router,
     };
-    use include_dir::{include_dir, Dir};
+    use leptos::config::LeptosOptions;
     use leptos::*;
     use leptos_axum::{generate_route_list, LeptosRoutes};
     use worker::{event, Context, Env, HttpRequest, Result};
 
-    static PKG_DIR: Dir = include_dir!("$CARGO_MANIFEST_DIR/pkg/");
-
-    async fn serve_static(Path(path): Path<String>) -> impl IntoResponse {
-        let mime_type = mime_guess::from_path(&path).first_or_text_plain();
-        let mut headers = axum::http::HeaderMap::new();
-        headers.insert(
-            axum::http::header::CONTENT_TYPE,
-            HeaderValue::from_str(mime_type.as_ref()).unwrap(),
-        );
-        match PKG_DIR.get_file(path) {
-            None => (StatusCode::NOT_FOUND, headers, "File not found.".as_bytes()),
-            Some(file) => (StatusCode::OK, headers, file.contents()),
-        }
-    }
-
-    fn router() -> Router {
+    fn router(env: Env) -> Router {
         let leptos_options = LeptosOptions::builder()
             .output_name("client")
             .site_pkg_dir("pkg")
@@ -407,10 +420,13 @@ mod ssr_imports {
 
         // build our application with a route
         let app: axum::Router<()> = Router::new()
-            .leptos_routes(&leptos_options, routes, App)
+            .leptos_routes(&leptos_options, routes, {
+                let leptos_options = leptos_options.clone();
+                move || super::shell(leptos_options.clone())
+            })
             .route("/api/*fn_name", post(leptos_axum::handle_server_fns))
-            .route("/pkg/*file_name", get(serve_static))
-            .with_state(leptos_options);
+            .with_state(leptos_options)
+            .layer(Extension(Arc::new(env)));
         app
     }
 
@@ -423,7 +439,7 @@ mod ssr_imports {
     #[event(fetch)]
     async fn fetch(
         req: HttpRequest,
-        _env: Env,
+        env: Env,
         _ctx: Context,
     ) -> Result<axum::http::Response<axum::body::Body>> {
         _ = console_log::init_with_level(log::Level::Debug);
@@ -431,6 +447,6 @@ mod ssr_imports {
 
         console_error_panic_hook::set_once();
 
-        Ok(router().call(req).await?)
+        Ok(router(env).call(req).await?)
     }
 }
