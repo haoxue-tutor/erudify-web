@@ -1,0 +1,13 @@
+[licenses]
+allow = [
+  "Unicode-3.0",
+  "Unicode-DFS-2016",
+  "Apache-2.0",
+  "MIT",
+  "BSL-1.0",
+  "Zlib",
+  "BSD-3-Clause",
+  "Unlicense",
+  "ISC",
+  "MPL-2.0",
+]

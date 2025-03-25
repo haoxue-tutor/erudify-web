@@ -1,5 +1,5 @@
+use leptos::prelude::*;
 use leptos::task::spawn_local;
-use leptos::{prelude::*, *};
 use leptos_meta::*;
 use leptos_router::*;
 use leptos_router::{components::*, hooks::use_query_map};
@@ -81,7 +81,7 @@ pub async fn shouting_text(input: String) -> Result<String, ServerFnError> {
 
 #[component]
 pub fn SizedInput() -> impl IntoView {
-    let (value, set_value) = create_signal(String::new());
+    let (value, set_value) = signal(String::new());
     view! {
         <input type="text" style:width="5em" autofocus on:input=move |ev| {
             ev.prevent_default();
@@ -278,12 +278,12 @@ pub async fn get_github_user_info(code: String) -> Result<(String, String), Serv
 fn GithubOAuth2Callback() -> impl IntoView {
     use leptos::*;
 
-    let (user_info, set_user_info) = create_signal(String::new());
-    let (user_email, set_user_email) = create_signal(String::new());
+    let (user_info, set_user_info) = signal(String::new());
+    let (user_email, set_user_email) = signal(String::new());
     let query_map = use_query_map();
     let code = query_map.with(|query_map| query_map.get("code").unwrap_or_default());
 
-    create_effect(move |_| {
+    Effect::new(move || {
         let code = code.clone();
         spawn_local(async move {
             let (user_info, user_email) = get_github_user_info(code).await.unwrap();
@@ -398,14 +398,8 @@ mod ssr_imports {
     use std::sync::Arc;
 
     use crate::App;
-    use axum::http::{HeaderValue, StatusCode};
     use axum::Extension;
-    use axum::{
-        extract::Path,
-        response::IntoResponse,
-        routing::{get, post},
-        Router,
-    };
+    use axum::{routing::post, Router};
     use leptos::config::LeptosOptions;
     use leptos::*;
     use leptos_axum::{generate_route_list, LeptosRoutes};
