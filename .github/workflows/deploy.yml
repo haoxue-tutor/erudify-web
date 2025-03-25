@@ -1,47 +1,47 @@
 name: Deploy
 
+concurrency:
+  group: "${{ github.workflow }}-${{ github.ref }}"
+  cancel-in-progress: "${{ github.ref != 'refs/heads/main' }}"
+
 on:
+  workflow_dispatch:
+  merge_group:
   pull_request:
     branches:
       - main
+    types:
+      - opened
+      - reopened
+      - synchronize
+      - ready_for_review
   push:
     branches:
       - main
 
 jobs:
   deploy:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
 
+    permissions:
+      contents: read
+      id-token: write
+    if: github.event.pull_request.draft == false
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+      - uses: DeterminateSystems/nix-installer-action@main
+        with:
+          determinate: true
+      - uses: DeterminateSystems/flakehub-cache-action@main
 
-    - name: Setup Rust
-      uses: actions-rust-lang/setup-rust-toolchain@v1
+      - run: nix build .
 
-    - name: Configure caching
-      uses: Swatinem/rust-cache@v2
+      - name: Dry Run
+        if: github.ref != 'refs/heads/main'
+        run: nix run .#deploy -- --dry-run
 
-    - name: Install wasm-pack
-      run: curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh
-
-    - uses: sigoden/install-binary@v1
-      with:
-        repo: WebAssembly/binaryen
-        name: wasm-opt
-
-    - name: Install worker-build
-      run: cargo install --locked worker-build
-
-    - name: Dry Run
-      if: github.ref != 'refs/heads/main'
-      uses: cloudflare/wrangler-action@v3
-      with:
-        apiToken: ${{ secrets.CF_API_TOKEN }}
-        command: deploy --dry-run
-
-    - name: Publish
-      if: github.ref == 'refs/heads/main'
-      uses: cloudflare/wrangler-action@v3
-      with:
-        apiToken: ${{ secrets.CF_API_TOKEN }}
+      - name: Publish
+        if: github.ref == 'refs/heads/main'
+        run: nix run .#deploy
+        env:
+          CF_API_TOKEN: ${{ secrets.CF_API_TOKEN }}
