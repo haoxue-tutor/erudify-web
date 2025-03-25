@@ -2,7 +2,12 @@ name = "erudify-web"
 main = "result/build/worker/shim.mjs"
 compatibility_date = "2024-07-13"
 
-routes = [{ pattern = "erudify.org/*", zone_name = "erudify.org" }]
+routes = [
+  { pattern = "erudify.org", zone_name = "erudify.org", custom_domain = true },
+]
+
+[assets]
+directory = "result/assets"
 
 [build]
 command = """
