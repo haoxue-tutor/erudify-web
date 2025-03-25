@@ -370,7 +370,7 @@ pub fn shell(options: LeptosOptions) -> impl IntoView {
       <!DOCTYPE html>
       <html lang="en">
         <head>
-          <title>HIIT</title>
+          <title>Erudify</title>
           <meta charset="utf-8" />
           <meta name="viewport" content="width=device-width, initial-scale=1" />
 
