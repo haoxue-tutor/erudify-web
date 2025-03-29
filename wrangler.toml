@@ -11,7 +11,7 @@ directory = "result/assets"
 
 [build]
 command = """
-nix build .#erudify-web-dev
+nix build .#erudify-dev
 """
 
 [env.prebuilt.build]
