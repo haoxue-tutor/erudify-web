@@ -100,7 +100,7 @@ async fn check_stylesheet_loaded(driver: &WebDriver) -> Result<()> {
     // Wait for any element that should have CSS applied
     // For example, let's check the body element
     let body = driver
-        .find_element(By::Tag("body"))
+        .find(By::Tag("body"))
         .await
         .context("Failed to find body element")?;
 

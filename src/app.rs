@@ -205,6 +205,7 @@ pub fn App() -> impl IntoView {
                         view! { <div class="p-4 text-center">"Page Not Found"</div> }
                     }>
                         <Route path=path!("/") view=pages::StartPage />
+                        <Route path=path!("/study") view=pages::StudyPage />
                         <Route path=path!("/signin") view=auth::SignInPage />
                         <Route path=path!("/oauth/github") view=auth::GithubOAuth2Callback />
                     </Routes>

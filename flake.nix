@@ -19,6 +19,7 @@
       url = "github:rustsec/advisory-db";
       flake = false;
     };
+    lychee.url = "github:lycheeverse/lychee";
   };
 
   outputs = {
@@ -32,6 +33,7 @@
     crane,
     e2e,
     advisory-db,
+    lychee,
   }:
     utils.lib.eachDefaultSystem (
       system: let
@@ -46,6 +48,7 @@
         };
         worker-build-bin = worker-build.packages.${system}.default;
         wrangler-bin = wrangler.packages.${system}.default;
+        lychee-bin = lychee.packages.${system}.default;
 
         rustToolchain = pkgs.rust-bin.fromRustupToolchainFile ./rust-toolchain.toml;
 
@@ -280,6 +283,16 @@
           # Start the web service
           ${erudify-preview}/bin/erudify-preview &
           WEB_PID=$!
+
+          ${pkgs.retry}/bin/retry --until=success --delay "1,2,4" -- curl -s http://localhost:8787/
+
+          ${lychee-bin}/bin/lychee http://localhost:8787/
+          LINK_CHECK_EXIT=$?
+          if [ $LINK_CHECK_EXIT -ne 0 ]; then
+            echo "Link check failed"
+            kill $WEB_PID
+            exit 1
+          fi
 
           # Geckodriver is quite verbose, so we redirect the output to /dev/null
           # If you want to see the output, remove the redirection
