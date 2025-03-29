@@ -1,6 +1,7 @@
-mod app;
+pub mod app;
+pub mod components;
 #[cfg(feature = "hydrate")]
 mod hydrate;
-mod server;
+pub mod server;
 #[cfg(feature = "ssr")]
-mod ssr;
+pub mod ssr;

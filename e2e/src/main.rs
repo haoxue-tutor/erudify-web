@@ -72,6 +72,7 @@ async fn main() -> Result<()> {
 
 async fn tests(driver: &WebDriver) -> Result<()> {
     check_title(driver, "Erudify").await?;
+    check_stylesheet_loaded(driver).await?;
     Ok(())
 }
 
@@ -92,5 +93,32 @@ async fn check_title(driver: &WebDriver, expected_title: &str) -> Result<()> {
         title,
         expected_title
     );
+    Ok(())
+}
+
+async fn check_stylesheet_loaded(driver: &WebDriver) -> Result<()> {
+    // Wait for any element that should have CSS applied
+    // For example, let's check the body element
+    let body = driver
+        .find_element(By::Tag("body"))
+        .await
+        .context("Failed to find body element")?;
+
+    // Get the computed style of the element
+    let background_color = driver
+        .execute(
+            "return window.getComputedStyle(arguments[0]).backgroundColor",
+            vec![body.to_json()?],
+        )
+        .await
+        .context("Failed to get computed style")?;
+    let background_color = background_color.json().as_str().unwrap_or("").to_string();
+
+    // Verify that the background color is not undefined or empty
+    ensure!(
+        !background_color.is_empty(),
+        "CSS styles not loaded - background-color is empty"
+    );
+
     Ok(())
 }
