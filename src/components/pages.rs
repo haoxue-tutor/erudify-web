@@ -30,3 +30,13 @@ pub fn StartPage() -> impl IntoView {
         </div>
     }
 }
+
+#[component]
+pub fn StudyPage() -> impl IntoView {
+    view! {
+        <div class="container mx-auto px-4 py-8">
+            <h1 class="text-3xl font-bold mb-6">"Study Page Placeholder"</h1>
+            <p class="text-lg">This will be a study page.</p>
+        </div>
+    }
+}
